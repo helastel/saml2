@@ -80,6 +80,19 @@ class HTTPRedirect extends Binding
     {
         $destination = $this->getRedirectURL($message);
         Utils::getContainer()->getLogger()->debug('Redirect to ' . strlen($destination) . ' byte URL: ' . $destination);
+        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+            
+            header("HTTP/1.1 401 Unauthorized");
+            header('Pragma: no-cache');
+            header('Cache-Control: no-cache, must-revalidate');
+            header('Cache-Control: no-cache, must-revalidate');
+            header('Content-Type: application/json');
+            
+            $response = new \stdClass();
+            $response->authUrl = $destination;
+            echo json_encode($response);
+            exit();
+        }
         Utils::getContainer()->redirect($destination);
     }
 
